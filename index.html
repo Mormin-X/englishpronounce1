@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英語發音小花園 - Pronunciation Garden</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            fredoka: ['Fredoka', 'sans-serif'],
+            sans: ['"Noto Sans TC"', 'Fredoka', 'sans-serif'],
+          },
+          colors: {
+            cream: '#FAF8F5',
+            mint: {
+              50: '#F0FDF4',
+              100: '#DCFCE7',
+              200: '#BBF7D0',
+              400: '#4ADE80',
+              500: '#22C55E',
+              600: '#16A34A',
+            },
+            pastel: {
+              blue: '#E0F2FE',
+              sky: '#BAE6FD',
+              purple: '#F3E8FF',
+              peach: '#FFE4E6',
+              yellow: '#FEF08A',
+              orange: '#FFEDD5',
+            }
+          },
+          boxShadow: {
+            'soft': '0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04)',
+            'bubble': '0 8px 0px 0px rgba(0,0,0,0.06)',
+            'bubble-active': '0 2px 0px 0px rgba(0,0,0,0.06)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background: radial-gradient(circle at 10% 20%, #F5FBF7 0%, #FAF8F5 90%);
+      user-select: none;
+    }
+    .mic-pulse {
+      animation: pulseGlow 1.8s infinite;
+    }
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+        transform: scale(1);
+      }
+      70% {
+        box-shadow: 0 0 0 20px rgba(74, 222, 128, 0);
+        transform: scale(1.04);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+        transform: scale(1);
+      }
+    }
+    .bounce-in {
+      animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes bounceIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .pop-in {
+      animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.7) translateY(20px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .celebrate-float {
+      animation: floatBadge 2s ease-in-out infinite;
+    }
+    @keyframes floatBadge {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-700 flex flex-col justify-between selection:bg-mint-200">
+
+  <header class="w-full max-w-4xl mx-auto px-4 pt-6 pb-2 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-mint-400 to-emerald-300 flex items-center justify-center text-2xl shadow-sm text-white">
+        🌱
+      </div>
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold font-fredoka text-slate-800 tracking-wide flex items-center gap-2">
+          Pronunciation Garden
+          <span class="text-xs font-normal px-2.5 py-0.5 bg-mint-100 text-mint-700 rounded-full font-sans">發音小花園</span>
+        </h1>
+        <p class="text-xs text-slate-500 font-sans">放輕鬆大聲唸，每一朵花都會為你盛開！</p>
+      </div>
+    </div>
+
+    <!-- Star Counter & Group selector -->
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-3.5 py-1.5 rounded-full shadow-sm">
+        <span class="text-amber-400 text-lg">⭐</span>
+        <span id="starCounter" class="font-fredoka font-bold text-amber-700 text-sm">0</span>
+      </div>
+      <button id="categoryFilterBtn" class="hidden sm:flex items-center gap-1.5 bg-white border border-slate-200 hover:border-slate-300 px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 transition shadow-sm">
+        <span>📚 音節分類</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Category Drawer / Selector Modal (Hidden by default) -->
+  <div id="categoryModal" class="hidden fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-xl border border-slate-100 transform transition-all">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-slate-800 text-lg">選擇練習聲音家族</h3>
+        <button id="closeCategoryBtn" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">✕</button>
+      </div>
+      <p class="text-xs text-slate-500 mb-4">選定一個母音組合，能幫助你更快抓到發音規律唷！</p>
+      <div class="space-y-2.5" id="categoryOptions">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+  </div>
+
+  <main class="w-full max-w-2xl mx-auto px-4 flex-1 flex flex-col justify-center items-center py-4">
+    
+    <!-- Progress Indicator & Category Tag -->
+    <div class="w-full flex items-center justify-between mb-3 text-xs font-medium text-slate-500">
+      <span id="categoryBadge" class="bg-slate-100 px-3 py-1 rounded-full text-slate-600 flex items-center gap-1.5 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-mint-500 inline-block"></span>
+        <span id="categoryName">All Words 全部單字</span>
+      </span>
+      <span id="questionProgress" class="font-fredoka tracking-wider text-slate-400">1 / 54</span>
+    </div>
+
+    <!-- Question Card -->
+    <div class="w-full bg-white rounded-3xl p-6 sm:p-10 shadow-soft border border-slate-100/80 relative flex flex-col items-center justify-between min-h-[420px] transition-all">
+      
+      <!-- Top Action Bar inside Card: Listen Limit Count -->
+      <div class="w-full flex justify-between items-center">
+        <!-- Listen Counter Tooltip -->
+        <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-1.5 rounded-full border border-slate-200/60">
+          <span class="text-xs text-slate-500">示範發音:</span>
+          <div class="flex gap-1" id="listenDots">
+            <span class="w-2.5 h-2.5 rounded-full bg-mint-500 transition-all"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-mint-500 transition-all"></span>
+          </div>
+          <span id="listenCountText" class="text-xs font-bold text-slate-600 ml-1">剩 2 次</span>
+        </div>
+
+        <!-- Teacher's Voice Assist Button -->
+        <button id="listenBtn" title="聽老師唸一次（每題限2次）" class="flex items-center gap-1.5 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/70 text-indigo-700 rounded-full text-xs font-medium transition shadow-sm active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zm-2.5-1.23-6 5h-3.5c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h3.5l6 5c.67.55 1.5.08 1.5-.78v-16.44c0-.86-.83-1.33-1.5-.78z"/></svg>
+          <span>聽讀音</span>
+        </button>
+      </div>
+
+      <div class="my-6 text-center flex flex-col items-center justify-center flex-1">
+        <!-- Friendly Encouraging Plant / Character -->
+        <div id="avatarMascot" class="text-5xl sm:text-6xl mb-4 transition-transform hover:scale-110 cursor-pointer">
+          🌱
+        </div>
+
+        <!-- Visual Hint Illustration Badge (Above target word) -->
+        <div id="wordImageBadge" class="mb-2 w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-mint-50/80 border border-mint-200 flex items-center justify-center text-3xl sm:text-4xl shadow-sm transition-transform hover:scale-105">
+          🐦
+        </div>
+
+        <!-- The Target Word -->
+        <div class="relative inline-block">
+          <h2 id="targetWord" class="text-5xl sm:text-7xl font-bold font-fredoka text-slate-800 tracking-wide bounce-in">
+            bird
+          </h2>
+        </div>
+
+        <!-- Chinese definition (phonetic tag removed) -->
+        <div class="mt-3 flex items-center justify-center">
+          <span id="wordMeaning" class="text-base sm:text-lg font-medium text-slate-500 bg-slate-100/70 px-4 py-1 rounded-full">
+            小鳥
+          </span>
+        </div>
+      </div>
+
+      <div id="statusBox" class="w-full min-h-[52px] rounded-2xl flex items-center justify-center px-4 py-2 text-center text-sm transition-all mb-4 bg-slate-50 text-slate-500 border border-dashed border-slate-200">
+        <span id="statusMessage">點擊下方的麥克風，勇敢唸唸看！🌿</span>
+      </div>
+
+      <div class="w-full flex items-center justify-between gap-4 pt-2">
+        <!-- Prev Button -->
+        <button id="prevBtn" class="w-12 h-12 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold transition shadow-sm active:scale-95 disabled:opacity-30 disabled:pointer-events-none">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+        </button>
+
+        <!-- Big Gentle Mic Button -->
+        <button id="micBtn" class="flex-1 max-w-[220px] h-14 rounded-2xl bg-mint-500 hover:bg-mint-600 text-white font-fredoka font-semibold flex items-center justify-center gap-3 shadow-lg shadow-mint-500/25 transition transform active:scale-95">
+          <span id="micIcon" class="text-xl">🎙️</span>
+          <span id="micText" class="text-base font-sans">換我唸唸看</span>
+        </button>
+
+        <!-- Next Button -->
+        <button id="nextBtn" class="w-12 h-12 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold transition shadow-sm active:scale-95">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Quick Tips Bottom Note -->
+    <div class="mt-4 text-center">
+      <p class="text-xs text-slate-400">💡 溫馨小提醒：練習時請在安靜處大聲朗讀，不論唸得如何，每次嘗試都超級棒！</p>
+    </div>
+
+  </main>
+
+  <footer class="w-full max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400 border-t border-slate-200/50">
+    <div class="flex items-center gap-2">
+      <button id="showAllListBtn" class="underline hover:text-slate-600 cursor-pointer">
+        查看全部 54 個單字清單
+      </button>
+      <span>•</span>
+      <button id="randomizeBtn" class="hover:text-slate-600">
+        🔀 隨機抽題模式
+      </button>
+    </div>
+    <div class="text-slate-400">
+      為小學生量身打造的暖心英語角 ✨
+    </div>
+  </footer>
+
+  <!-- Modal for full word list with completion checkmarks -->
+  <div id="wordListModal" class="hidden fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-xl border border-slate-100">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+        <div>
+          <h3 class="font-bold text-slate-800 text-lg">所有單字學習進度表</h3>
+          <p class="text-xs text-slate-400">點擊單字可直接切換練習！</p>
+        </div>
+        <button id="closeListBtn" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">✕</button>
+      </div>
+      <div id="wordGridList" class="flex-1 overflow-y-auto py-4 grid grid-cols-2 sm:grid-cols-3 gap-2.5 pr-1">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Big Pop-up Modal for Feedback (Success & Retry) -->
+  <div id="feedbackModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all">
+    <div id="feedbackCard" class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl border border-slate-100 text-center flex flex-col items-center pop-in relative">
+      <!-- Big Decorative Visual Icon -->
+      <div id="feedbackIconWrapper" class="w-24 h-24 rounded-3xl flex items-center justify-center text-5xl mb-4 shadow-sm celebrate-float">
+        🎉
+      </div>
+
+      <h3 id="feedbackTitle" class="text-2xl font-bold font-fredoka text-slate-800 mb-1">
+        太厲害了！
+      </h3>
+
+      <div id="feedbackWordBadge" class="font-fredoka text-xl text-mint-600 font-semibold mb-2">
+        bird
+      </div>
+
+      <p id="feedbackDesc" class="text-sm text-slate-600 mb-6 leading-relaxed">
+        發音非常標準！累積獲得了 1 顆 ⭐ 小星星！
+      </p>
+
+      <!-- Action Button inside Modal -->
+      <button id="feedbackActionBtn" class="w-full py-3.5 px-6 rounded-2xl font-semibold shadow-md transition transform active:scale-95 flex items-center justify-center gap-2">
+        <span>前進下一題</span>
+        <span>➔</span>
+      </button>
+
+      <!-- Subtle Auto-advance counter hint for success -->
+      <span id="feedbackCountdown" class="text-[11px] text-slate-400 mt-3 block">
+        （1.5 秒後自動前往下一題）
+      </span>
+    </div>
+  </div>
+
+  <script>
+    // --- 1. Word Database with Natural Phonics Classification, Visual Icons & Friendly Translations ---
+    const RAW_WORDS_DATA = [
+      // /ɜːr/ sound group (ir, ur, er, or, ear)
+      { word: "bird", sound: "/ɜːr/", cn: "小鳥", group: "er_sound", icon: "🐦" },
+      { word: "skirt", sound: "/ɜːr/", cn: "裙子", group: "er_sound", icon: "👗" },
+      { word: "shirt", sound: "/ɜːr/", cn: "襯衫", group: "er_sound", icon: "👔" },
+      { word: "girl", sound: "/ɜːr/", cn: "女孩", group: "er_sound", icon: "👧" },
+      { word: "turn", sound: "/ɜːr/", cn: "轉彎 / 輪流", group: "er_sound", icon: "🔄" },
+      { word: "nurse", sound: "/ɜːr/", cn: "護理師", group: "er_sound", icon: "👩‍⚕️" },
+      { word: "her", sound: "/ɜːr/", cn: "她的", group: "er_sound", icon: "🙋‍♀️" },
+      { word: "were", sound: "/ɜːr/", cn: "是 (過去式)", group: "er_sound", icon: "🕰️" },
+      { word: "work", sound: "/ɜːr/", cn: "工作", group: "er_sound", icon: "💼" },
+      { word: "learn", sound: "/ɜːr/", cn: "學習", group: "er_sound", icon: "📖" },
+
+      // /ɑːr/ sound group (ar, are)
+      { word: "sure", sound: "/ʊər/", cn: "確定的", group: "ar_sound", icon: "👌" },
+      { word: "are", sound: "/ɑːr/", cn: "是", group: "ar_sound", icon: "👥" },
+      { word: "car", sound: "/ɑːr/", cn: "汽車", group: "ar_sound", icon: "🚗" },
+      { word: "star", sound: "/ɑːr/", cn: "星星", group: "ar_sound", icon: "⭐" },
+      { word: "card", sound: "/ɑːr/", cn: "卡片", group: "ar_sound", icon: "🃏" },
+      { word: "hard", sound: "/ɑːr/", cn: "困難的 / 堅硬", group: "ar_sound", icon: "🪨" },
+      { word: "yard", sound: "/ɑːr/", cn: "院子 / 庭院", group: "ar_sound", icon: "🏡" },
+      { word: "art", sound: "/ɑːr/", cn: "美術", group: "ar_sound", icon: "🎨" },
+      { word: "smart", sound: "/ɑːr/", cn: "聰明的", group: "ar_sound", icon: "💡" },
+      { word: "start", sound: "/ɑːr/", cn: "開始", group: "ar_sound", icon: "🏁" },
+      { word: "park", sound: "/ɑːr/", cn: "公園", group: "ar_sound", icon: "🏞️" },
+      { word: "arm", sound: "/ɑːr/", cn: "手臂", group: "ar_sound", icon: "💪" },
+      { word: "farm", sound: "/ɑːr/", cn: "農場", group: "ar_sound", icon: "🚜" },
+      { word: "March", sound: "/ɑːr/", cn: "三月", group: "ar_sound", icon: "📅" },
+      { word: "large", sound: "/ɑːr/", cn: "巨大的", group: "ar_sound", icon: "🐘" },
+
+      // Long /aɪ/ sound group (i_e, igh, y, uy)
+      { word: "find", sound: "/aɪ/", cn: "找到", group: "ai_sound", icon: "🔍" },
+      { word: "nice", sound: "/aɪ/", cn: "友善的 / 好看", group: "ai_sound", icon: "✨" },
+      { word: "rice", sound: "/aɪ/", cn: "米飯", group: "ai_sound", icon: "🍚" },
+      { word: "ride", sound: "/aɪ/", cn: "騎車", group: "ai_sound", icon: "🚴" },
+      { word: "kite", sound: "/aɪ/", cn: "風箏", group: "ai_sound", icon: "🪁" },
+      { word: "white", sound: "/aɪ/", cn: "白色", group: "ai_sound", icon: "⚪" },
+      { word: "write", sound: "/aɪ/", cn: "書寫", group: "ai_sound", icon: "✍️" },
+      { word: "bike", sound: "/aɪ/", cn: "腳踏車", group: "ai_sound", icon: "🚲" },
+      { word: "like", sound: "/aɪ/", cn: "喜歡", group: "ai_sound", icon: "❤️" },
+      { word: "hike", sound: "/aɪ/", cn: "健行 / 遠足", group: "ai_sound", icon: "🥾" },
+      { word: "time", sound: "/aɪ/", cn: "時間", group: "ai_sound", icon: "⏰" },
+      { word: "fine", sound: "/aɪ/", cn: "美好的 / 不錯", group: "ai_sound", icon: "👍" },
+      { word: "nine", sound: "/aɪ/", cn: "數字九", group: "ai_sound", icon: "9️⃣" },
+      { word: "five", sound: "/aɪ/", cn: "數字五", group: "ai_sound", icon: "5️⃣" },
+      { word: "drive", sound: "/aɪ/", cn: "開車", group: "ai_sound", icon: "🚙" },
+      { word: "smile", sound: "/aɪ/", cn: "微笑", group: "ai_sound", icon: "😊" },
+      { word: "pie", sound: "/aɪ/", cn: "派餅", group: "ai_sound", icon: "🥧" },
+      { word: "night", sound: "/aɪ/", cn: "夜晚", group: "ai_sound", icon: "🌙" },
+      { word: "light", sound: "/aɪ/", cn: "燈光 / 光線", group: "ai_sound", icon: "💡" },
+      { word: "right", sound: "/aɪ/", cn: "對的 / 右邊", group: "ai_sound", icon: "👉" },
+      { word: "buy", sound: "/aɪ/", cn: "購買", group: "ai_sound", icon: "🛍️" },
+      { word: "why", sound: "/aɪ/", cn: "為什麼", group: "ai_sound", icon: "❓" },
+      { word: "cry", sound: "/aɪ/", cn: "哭泣", group: "ai_sound", icon: "😢" },
+      { word: "dry", sound: "/aɪ/", cn: "乾燥的", group: "ai_sound", icon: "🏜️" },
+      { word: "try", sound: "/aɪ/", cn: "嘗試", group: "ai_sound", icon: "🎯" },
+      { word: "fly", sound: "/aɪ/", cn: "飛翔", group: "ai_sound", icon: "🕊️" },
+      { word: "sky", sound: "/aɪ/", cn: "天空", group: "ai_sound", icon: "☁️" },
+      { word: "eye", sound: "/aɪ/", cn: "眼睛", group: "ai_sound", icon: "👁️" }
+    ];
+
+    const CATEGORIES = {
+      all: { name: "全部單字 (All Words)", filter: () => true },
+      er_sound: { name: "捲舌母音 /ɜːr/ 家族 (bird, girl, nurse...)", filter: item => item.group === "er_sound" },
+      ar_sound: { name: "長母音 /ɑːr/ 家族 (star, park, farm...)", filter: item => item.group === "ar_sound" },
+      ai_sound: { name: "雙母音 /aɪ/ 家族 (kite, smile, night...)", filter: item => item.group === "ai_sound" }
+    };
+
+    // State
+    let currentCategoryKey = 'all';
+    let filteredList = [...RAW_WORDS_DATA];
+    let currentIndex = 0;
+    let listenCounts = {}; // Track word: count (max 2)
+    let passedWords = new Set();
+    let isRecording = false;
+    let speechRecognition = null;
+    let synth = window.speechSynthesis;
+    let autoNextTimeout = null;
+
+    // Mascots based on success
+    const HAPPY_MASCOTS = ["🌸", "🌻", "🌟", "🎉", "🌈", "🐱", "🐶", "🐰"];
+    const NEUTRAL_MASCOTS = ["🌱", "🌿", "🍀", "🪴", "🌷"];
+
+    // Sound Synthesizer for pleasant tactile feedback (Web Audio API)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playChime(success = true) {
+      if (!audioCtx) return;
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (success) {
+          // Warm cheerful major triad
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+          osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.22); // G5
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+          osc.start(now);
+          osc.stop(now + 0.6);
+        } else {
+          // Gentle warm "try again" nudge (no harsh buzzer)
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(329.63, now); // E4
+          osc.frequency.exponentialRampToValueAtTime(293.66, now + 0.15); // D4
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        }
+      } catch (e) {
+        // Audio error silent fallback
+      }
+    }
+
+    const targetWordEl = document.getElementById('targetWord');
+    const wordMeaningEl = document.getElementById('wordMeaning');
+    const wordImageBadge = document.getElementById('wordImageBadge');
+    const questionProgressEl = document.getElementById('questionProgress');
+    const listenDotsEl = document.getElementById('listenDots');
+    const listenCountTextEl = document.getElementById('listenCountText');
+    const listenBtn = document.getElementById('listenBtn');
+    const micBtn = document.getElementById('micBtn');
+    const micIcon = document.getElementById('micIcon');
+    const micText = document.getElementById('micText');
+    const statusBox = document.getElementById('statusBox');
+    const statusMessage = document.getElementById('statusMessage');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const starCounter = document.getElementById('starCounter');
+    const avatarMascot = document.getElementById('avatarMascot');
+    const categoryBadge = document.getElementById('categoryBadge');
+    const categoryName = document.getElementById('categoryName');
+
+    // Pop-up Feedback Modal Elements
+    const feedbackModal = document.getElementById('feedbackModal');
+    const feedbackCard = document.getElementById('feedbackCard');
+    const feedbackIconWrapper = document.getElementById('feedbackIconWrapper');
+    const feedbackTitle = document.getElementById('feedbackTitle');
+    const feedbackWordBadge = document.getElementById('feedbackWordBadge');
+    const feedbackDesc = document.getElementById('feedbackDesc');
+    const feedbackActionBtn = document.getElementById('feedbackActionBtn');
+    const feedbackCountdown = document.getElementById('feedbackCountdown');
+    const randomizeBtn = document.getElementById('randomizeBtn');
+
+    function initSpeechEngine() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        statusBox.className = "w-full min-h-[52px] rounded-2xl flex items-center justify-center px-4 py-2 text-center text-sm transition-all mb-4 bg-amber-50 text-amber-800 border border-amber-200";
+        statusMessage.innerHTML = "⚠️ 瀏覽器尚未支援麥克風語音辨識，建議使用 Google Chrome 或 Edge 瀏覽器開啟體驗！";
+        micBtn.disabled = true;
+        micBtn.classList.add('opacity-50', 'pointer-events-none');
+        return;
+      }
+
+      speechRecognition = new SpeechRecognition();
+      speechRecognition.continuous = false;
+      speechRecognition.interimResults = false;
+      speechRecognition.lang = 'en-US'; // English US standard for elementary learners
+      speechRecognition.maxAlternatives = 4;
+
+      speechRecognition.onstart = () => {
+        isRecording = true;
+        micBtn.classList.remove('bg-mint-500', 'hover:bg-mint-600');
+        micBtn.classList.add('bg-rose-500', 'hover:bg-rose-600', 'mic-pulse');
+        micIcon.innerText = "🛑";
+        micText.innerText = "請說出單字...";
+        statusBox.className = "w-full min-h-[52px] rounded-2xl flex items-center justify-center px-4 py-2 text-center text-sm transition-all mb-4 bg-emerald-50 text-emerald-800 border border-emerald-200";
+        statusMessage.innerHTML = `<span class="inline-block animate-bounce mr-2">👂</span> 小耳朵正在專心聽你說...`;
+      };
+
+      speechRecognition.onresult = (event) => {
+        const currentTarget = filteredList[currentIndex].word.toLowerCase().trim();
+        let recognizedWords = [];
+
+        for (let i = 0; i < event.results[0].length; i++) {
+          const transcript = event.results[0][i].transcript.toLowerCase().trim();
+          // Remove trailing punctuations
+          const clean = transcript.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "");
+          recognizedWords.push(clean);
+        }
+
+        evaluatePronunciation(currentTarget, recognizedWords);
+      };
+
+      speechRecognition.onerror = (event) => {
+        isRecording = false;
+        resetMicButton();
+        if (event.error === 'no-speech') {
+          showEncouragement("沒聽到聲音耶，不要害羞，靠麥克風近一點再試試！🌱", "neutral");
+        } else if (event.error === 'not-allowed') {
+          showEncouragement("請點選網址列旁的鎖頭，允許使用麥克風喔！🎙️", "neutral");
+        } else {
+          showEncouragement("收音被打斷了，我們再唸一次看看！💪", "neutral");
+        }
+      };
+
+      speechRecognition.onend = () => {
+        isRecording = false;
+        resetMicButton();
+      };
+    }
+
+    function resetMicButton() {
+      micBtn.classList.remove('bg-rose-500', 'hover:bg-rose-600', 'mic-pulse');
+      micBtn.classList.add('bg-mint-500', 'hover:bg-mint-600');
+      micIcon.innerText = "🎙️";
+      micText.innerText = "換我唸唸看";
+    }
+
+    // Accounts for homophones & common ASR variations (e.g. eye/I, write/right/rite, buy/by/bye)
+    const HOMOPHONES_MAP = {
+      "eye": ["eye", "i", "aye"],
+      "buy": ["buy", "by", "bye"],
+      "write": ["write", "right", "rite"],
+      "right": ["right", "write", "rite"],
+      "night": ["night", "knight"],
+      "were": ["were", "ware", "where"],
+      "are": ["are", "r", "our"],
+      "sure": ["sure", "shore"],
+      "march": ["march"],
+      "nice": ["nice"],
+      "dry": ["dry"],
+      "fly": ["fly"]
+    };
+
+    function evaluatePronunciation(target, spokenTranscripts) {
+      const allowedMatches = HOMOPHONES_MAP[target] || [target];
+      
+      let isMatch = false;
+      let matchedWord = "";
+
+      for (const phrase of spokenTranscripts) {
+        // Check exact match
+        if (allowedMatches.includes(phrase)) {
+          isMatch = true;
+          matchedWord = phrase;
+          break;
+        }
+        // Check if phrase contains the target as a standalone word (e.g. "a bird" or "it's blue")
+        const words = phrase.split(/\s+/);
+        if (words.some(w => allowedMatches.includes(w))) {
+          isMatch = true;
+          matchedWord = phrase;
+          break;
+        }
+      }
+
+      if (isMatch) {
+        // Success: accumulate star, show big celebration pop-up and auto-advance
+        playChime(true);
+        passedWords.add(target);
+        updateStarScore();
+        avatarMascot.innerText = HAPPY_MASCOTS[Math.floor(Math.random() * HAPPY_MASCOTS.length)];
+        triggerWordCelebration();
+        showFeedbackPopup(true, target);
+      } else {
+        // Gentle, supportive big pop-up modal to try again
+        playChime(false);
+        const heard = spokenTranscripts[0] ? spokenTranscripts[0] : "";
+        showFeedbackPopup(false, target, heard);
+      }
+    }
+
+    // --- Big Pop-up Modal Controller ---
+    function showFeedbackPopup(isSuccess, targetWord, heardText = "") {
+      if (autoNextTimeout) clearTimeout(autoNextTimeout);
+
+      const wordObj = filteredList[currentIndex];
+      feedbackModal.classList.remove('hidden');
+      feedbackWordBadge.innerText = `${targetWord.toUpperCase()}（${wordObj.cn}）`;
+
+      if (isSuccess) {
+        // Success State
+        feedbackIconWrapper.className = "w-24 h-24 rounded-3xl bg-mint-100 text-mint-600 flex items-center justify-center text-5xl mb-4 shadow-sm celebrate-float";
+        feedbackIconWrapper.innerText = "⭐";
+        feedbackTitle.innerText = "太棒了！唸得非常準！";
+        feedbackTitle.className = "text-2xl font-bold font-fredoka text-emerald-800 mb-1";
+        feedbackWordBadge.className = "font-fredoka text-lg text-emerald-600 font-semibold mb-2";
+        feedbackDesc.innerHTML = `恭喜獲得 1 顆小星星！🌟<br><span class="text-xs text-slate-400">發音音準清晰又自信，繼續保持唷！</span>`;
+        
+        feedbackActionBtn.className = "w-full py-3.5 px-6 rounded-2xl font-semibold shadow-md transition transform active:scale-95 flex items-center justify-center gap-2 bg-mint-500 hover:bg-mint-600 text-white shadow-mint-500/25 cursor-pointer";
+        feedbackActionBtn.innerHTML = `<span>前往下一題</span> <span>➔</span>`;
+        feedbackCountdown.classList.remove('hidden');
+        feedbackCountdown.innerText = "（1.6 秒後自動前往下一題...）";
+
+        feedbackActionBtn.onclick = () => {
+          if (autoNextTimeout) clearTimeout(autoNextTimeout);
+          closeFeedbackModal();
+          goNext();
+        };
+
+        // Auto Advance Timer
+        autoNextTimeout = setTimeout(() => {
+          closeFeedbackModal();
+          goNext();
+        }, 1600);
+
+      } else {
+        // Retry / Encouragement State
+        feedbackIconWrapper.className = "w-24 h-24 rounded-3xl bg-amber-100 text-amber-600 flex items-center justify-center text-5xl mb-4 shadow-sm";
+        feedbackIconWrapper.innerText = wordObj.icon || "🌱";
+        feedbackTitle.innerText = "差一點點囉，再試一次！";
+        feedbackTitle.className = "text-2xl font-bold font-fredoka text-amber-800 mb-1";
+        feedbackWordBadge.className = "font-fredoka text-lg text-amber-600 font-semibold mb-2";
+        
+        const heardMsg = heardText ? `聽到的發音接近「${heardText}」` : "剛剛沒有聽得很清楚";
+        feedbackDesc.innerHTML = `${heardMsg}，放輕鬆不要害羞！<br><span class="text-xs text-slate-400">大聲再唸一次，或者按「聽讀音」聽聽看！🌿</span>`;
+
+        feedbackActionBtn.className = "w-full py-3.5 px-6 rounded-2xl font-semibold shadow-md transition transform active:scale-95 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/25 cursor-pointer";
+        feedbackActionBtn.innerHTML = `<span>🎙️ 再唸一次</span>`;
+        feedbackCountdown.classList.add('hidden');
+
+        feedbackActionBtn.onclick = () => {
+          closeFeedbackModal();
+          setTimeout(() => {
+            micBtn.click(); // Automatically re-trigger mic for smooth practice
+          }, 200);
+        };
+      }
+    }
+
+    function closeFeedbackModal() {
+      feedbackModal.classList.add('hidden');
+      if (autoNextTimeout) clearTimeout(autoNextTimeout);
+    }
+
+    function showEncouragement(msg, type = "neutral") {
+      statusMessage.innerText = msg;
+      if (type === "success") {
+        statusBox.className = "w-full min-h-[52px] rounded-2xl flex items-center justify-center px-4 py-2 text-center text-sm transition-all mb-4 bg-mint-100 text-mint-700 border border-mint-200 font-medium";
+      } else if (type === "gentle") {
+        statusBox.className = "w-full min-h-[52px] rounded-2xl flex items-center justify-center px-4 py-2 text-center text-sm transition-all mb-4 bg-amber-50 text-amber-700 border border-amber-200";
+      } else {
+        statusBox.className = "w-full min-h-[52px] rounded-2xl flex items-center justify-center px-4 py-2 text-center text-sm transition-all mb-4 bg-slate-50 text-slate-600 border border-dashed border-slate-200";
+      }
+    }
+
+    function triggerWordCelebration() {
+      targetWordEl.classList.remove('bounce-in');
+      void targetWordEl.offsetWidth; // Reflow
+      targetWordEl.classList.add('bounce-in');
+    }
+
+    function updateStarScore() {
+      starCounter.innerText = passedWords.size;
+    }
+
+    function playTeacherPronunciation() {
+      const currentWordObj = filteredList[currentIndex];
+      const word = currentWordObj.word;
+      
+      const usedCount = listenCounts[word] || 0;
+      if (usedCount >= 2) {
+        showEncouragement("這題的 2 次聆聽機會已經用完囉！換你勇敢唸唸看 🌱", "neutral");
+        return;
+      }
+
+      // Increment count
+      listenCounts[word] = usedCount + 1;
+      updateListenCounterUI(listenCounts[word]);
+
+      // Speak using Web Speech Synthesis
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Stop prior
+        const utter = new SpeechSynthesisUtterance(word);
+        utter.lang = 'en-US';
+        utter.rate = 0.85; // Slightly slower, clear for young learners
+        utter.pitch = 1.05;
+
+        // Try selecting an English natural voice if loaded
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')));
+        if (preferredVoice) {
+          utter.voice = preferredVoice;
+        }
+
+        listenBtn.classList.add('scale-95');
+        utter.onend = () => {
+          listenBtn.classList.remove('scale-95');
+        };
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function updateListenCounterUI(usedCount) {
+      const remaining = Math.max(0, 2 - usedCount);
+      listenCountTextEl.innerText = `剩 ${remaining} 次`;
+      
+      // Update green dots
+      const dots = listenDotsEl.children;
+      if (usedCount === 0) {
+        dots[0].className = "w-2.5 h-2.5 rounded-full bg-mint-500 transition-all";
+        dots[1].className = "w-2.5 h-2.5 rounded-full bg-mint-500 transition-all";
+        listenBtn.disabled = false;
+      } else if (usedCount === 1) {
+        dots[0].className = "w-2.5 h-2.5 rounded-full bg-slate-300 transition-all";
+        dots[1].className = "w-2.5 h-2.5 rounded-full bg-mint-500 transition-all";
+        listenBtn.disabled = false;
+      } else {
+        dots[0].className = "w-2.5 h-2.5 rounded-full bg-slate-200 transition-all";
+        dots[1].className = "w-2.5 h-2.5 rounded-full bg-slate-200 transition-all";
+        listenBtn.disabled = true; // Button disabled after 2 listens
+      }
+    }
+
+    function renderCurrentWord() {
+      if (filteredList.length === 0) return;
+      const data = filteredList[currentIndex];
+
+      // Update text with cute formatting
+      targetWordEl.innerText = data.word;
+      wordMeaningEl.innerText = data.cn;
+      questionProgressEl.innerText = `${currentIndex + 1} / ${filteredList.length}`;
+
+      // Update Image/Icon Badge above the target word
+      if (data.icon) {
+        wordImageBadge.innerText = data.icon;
+        wordImageBadge.classList.remove('hidden');
+      } else {
+        wordImageBadge.classList.add('hidden');
+      }
+
+      // Reset Mascot to friendly plant unless already passed
+      if (passedWords.has(data.word)) {
+        avatarMascot.innerText = "⭐";
+        showEncouragement(`這題你已經順利獲得星星囉！想複習也可以再唸一次！🌟`, "success");
+      } else {
+        avatarMascot.innerText = NEUTRAL_MASCOTS[currentIndex % NEUTRAL_MASCOTS.length];
+        showEncouragement("點擊下方的麥克風，勇敢唸唸看！🌿", "neutral");
+      }
+
+      // Sync Listen counts
+      const used = listenCounts[data.word] || 0;
+      updateListenCounterUI(used);
+
+      // Trigger animation
+      targetWordEl.classList.remove('bounce-in');
+      void targetWordEl.offsetWidth;
+      targetWordEl.classList.add('bounce-in');
+
+      // Update Prev / Next buttons state
+      prevBtn.disabled = currentIndex === 0;
+    }
+
+    function goNext() {
+      if (currentIndex < filteredList.length - 1) {
+        currentIndex++;
+        renderCurrentWord();
+      } else {
+        // Wrapped around or reached end
+        showEncouragement("哇！這組單字都練習一輪囉！你今天太棒了！🎉", "success");
+      }
+    }
+
+    function goPrev() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCurrentWord();
+      }
+    }
+
+    function buildCategoryOptions() {
+      categoryOptions.innerHTML = '';
+      Object.keys(CATEGORIES).forEach(key => {
+        const cat = CATEGORIES[key];
+        const isSelected = key === currentCategoryKey;
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left px-4 py-3 rounded-2xl flex items-center justify-between border transition ${
+          isSelected 
+            ? 'bg-mint-50 border-mint-400 text-mint-900 font-semibold' 
+            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+        }`;
+        btn.innerHTML = `
+          <span>${cat.name}</span>
+          ${isSelected ? '<span class="text-mint-600">✓</span>' : ''}
+        `;
+        btn.onclick = () => {
+          selectCategory(key);
+          categoryModal.classList.add('hidden');
+        };
+        categoryOptions.appendChild(btn);
+      });
+    }
+
+    function selectCategory(key) {
+      currentCategoryKey = key;
+      const cat = CATEGORIES[key];
+      filteredList = RAW_WORDS_DATA.filter(cat.filter);
+      currentIndex = 0;
+      categoryName.innerText = cat.name.split(' ')[0];
+      renderCurrentWord();
+    }
+
+    function renderWordGridList() {
+      wordGridList.innerHTML = '';
+      filteredList.forEach((item, idx) => {
+        const isPassed = passedWords.has(item.word);
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-2xl border text-left cursor-pointer transition flex items-center justify-between ${
+          idx === currentIndex 
+            ? 'border-mint-500 bg-mint-50/50 shadow-sm' 
+            : 'border-slate-100 hover:border-slate-200 bg-slate-50/60'
+        }`;
+        card.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="text-xl">${item.icon || '🌱'}</span>
+            <div>
+              <div class="font-fredoka font-bold text-slate-800 text-sm">${item.word}</div>
+              <div class="text-[11px] text-slate-400">${item.cn}</div>
+            </div>
+          </div>
+          <div class="text-xs">
+            ${isPassed ? '⭐' : '<span class="text-slate-300">○</span>'}
+          </div>
+        `;
+        card.onclick = () => {
+          currentIndex = idx;
+          renderCurrentWord();
+          wordListModal.classList.add('hidden');
+        };
+        wordGridList.appendChild(card);
+      });
+    }
+
+    micBtn.addEventListener('click', () => {
+      if (!speechRecognition) {
+        initSpeechEngine();
+      }
+      if (!speechRecognition) return;
+
+      if (isRecording) {
+        speechRecognition.stop();
+      } else {
+        try {
+          speechRecognition.start();
+        } catch (e) {
+          // In case it's in a transitional state
+          speechRecognition.stop();
+        }
+      }
+    });
+
+    listenBtn.addEventListener('click', playTeacherPronunciation);
+    nextBtn.addEventListener('click', goNext);
+    prevBtn.addEventListener('click', goPrev);
+
+    categoryFilterBtn.addEventListener('click', () => {
+      buildCategoryOptions();
+      categoryModal.classList.remove('hidden');
+    });
+    closeCategoryBtn.addEventListener('click', () => {
+      categoryModal.classList.add('hidden');
+    });
+
+    showAllListBtn.addEventListener('click', () => {
+      renderWordGridList();
+      wordListModal.classList.remove('hidden');
+    });
+    closeListBtn.addEventListener('click', () => {
+      wordListModal.classList.add('hidden');
+    });
+
+    randomizeBtn.addEventListener('click', () => {
+      // Fisher-Yates shuffle
+      for (let i = filteredList.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [filteredList[i], filteredList[j]] = [filteredList[j], filteredList[i]];
+      }
+      currentIndex = 0;
+      renderCurrentWord();
+      showEncouragement("已為你隨機打亂題目順序囉！✨", "neutral");
+    });
+
+    // Keyboard support (Space to record, arrows for navigation)
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.code === 'ArrowRight') {
+        goNext();
+      } else if (e.code === 'ArrowLeft') {
+        goPrev();
+      } else if (e.code === 'Space') {
+        e.preventDefault();
+        micBtn.click();
+      }
+    });
+
+    // Make sure speech synth voices load correctly in Chrome/Safari
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        // Voices preloaded
+      };
+    }
+
+    window.onload = () => {
+      initSpeechEngine();
+      renderCurrentWord();
+    };
+  </script>
+</body>
+</html>
